@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MorseCodePlayer : MonoBehaviour {
+    
+    #region Public / SerializeField Variables
     public Text _txtMorseDebug;
     //public Text _txtMorseDotDash;
     //public Text _txtMorseBinary;
@@ -21,9 +23,10 @@ public class MorseCodePlayer : MonoBehaviour {
     public AudioClip morseNote_silence_0000000;
 
     public Animator theTelegraphKeyAnimator;
+    #endregion
 
+    #region Private Logic Variables
     private TextEditor _textEditor = new TextEditor(); // for copying and pasting into clipboard
-
 
     private string _enteredMorse = "Type message here";
 
@@ -37,8 +40,21 @@ public class MorseCodePlayer : MonoBehaviour {
     private float _playbackSpeedFactor = 1.0f; // a fraction, 1 = each beep is one second... 0.5 = each beep .5 seconds
     private int _currentPlaybackSetting = 0;
 
+    private float[] _playbackSpeeds = new float
+    []
+    {
+        1.0f,
+        0.5f,
+        0.25f,
+        0.125f,
+        0.0625f,
+        0.03125f
+    };
+    #endregion
+
+    #region Constants
     // colors ~ constants but cannot declare
-    // change these to change color scheme
+    // Change these to change color scheme if customizable
     private Color PLAYBACKBUTTON_COLOR_SELECTED = Color.red;
     private Color PLAYBACKBUTTON_COLOR_UNSELECTED = Color.white;
 
@@ -51,8 +67,21 @@ public class MorseCodePlayer : MonoBehaviour {
     const int MORSE_ASCII_NUM_2 = 50;
     const int MORSE_ASCII_NUM_3 = 51;
     const int MORSE_ASCII_SIGN_NEGATIVE = 45;
-
-    private int [] _morseCodeSymbols = new int[39]
+    /*
+     * * ASCI RANGE
+     * A = 65;
+     * B = 66
+     *  ..
+     * Z = 90
+     *  
+     * space = 32
+     * 
+     * 0 = 48
+     * 1 = 49
+     *
+     * 9 = 57
+     */
+    private int[] _morseCodeSymbols = new int[39]
         {
             13, 3111, 3131, 311, 1, 1131, 331, 1111, 11, 1333, 313,
             1311, 33, 31, 333, 1331, 3313, 131, 111, 3, 113, 1113, 133, 3113, 3133, 3311,
@@ -68,8 +97,10 @@ public class MorseCodePlayer : MonoBehaviour {
             "-----",".----","..---","...--","....-",".....",
             "-....","--...","---..","----.",
             " ","   ","       "
-
        };
+    #endregion
+
+    #region Enumerations
 
     public enum MorseCodeNotes
     {
@@ -82,6 +113,7 @@ public class MorseCodePlayer : MonoBehaviour {
         morse_click,
     }
 
+    // silence_0 is an implied in this encoding process. seperation of symbols indicates a 0.  i.e. a 113  is really 101030 and 113-1331 is really 1010300030301
     public enum MorseCodeSymbols
     {
         A_13,
@@ -127,57 +159,26 @@ public class MorseCodePlayer : MonoBehaviour {
         PB_04_Sixteenth,
         PB_05_ThirtySecond
     }
-
-    private float[] _playbackSpeeds = new float
-    []
-    {
-        1.0f,
-        0.5f,
-        0.25f,
-        0.125f,
-        0.0625f,
-        0.03125f
-    };
-    // SILENCE_0 is an implied in the encoding process. seperation of symbols indicates a 0.  i.e. a 113  is really 101030 and 113-1331 is really 1010300030301
-
-    // ASCI RANGE
-    /*
-    *   A = 65;
-    *   B = 66
-    *  ..
-    *   Z = 90
-    *   
-    * space = 32
-    *
-    *   0 = 48
-    *   1 = 49
-    *
-    *   9 = 57
-    *
-    *
-    */
-
-	// Use this for initialization
-	void Start () {
-
-
+    #endregion
+ 
+    void Start () {
         ChangePlaybackSpeed((int)PlaybackSpeedSetting.PB_03_Eighth);
 
         _currentMorseMessage = ConvertStringToMorseCodeSymbols(_enteredMorse);
 
         //Debug.Log("SAMPLE MORSE = " + _enteredMorse);
 
-
+        // Testing functions
         // StartCoroutine(PlayMorseCodeSymbolCo(_morseCodeSymbols[(int)MorseCodeSymbols.A_13]) );
         // PlayMorseCodeSymbol((int)MorseCodeSymbols.P_1331);
     }
-	
 
+    #region Input Text, Speed and Playing Functions
     // symbol is the index of MorseCodeSymbols... the  code is stored in the _morseCodeSymbols
     public void PlayMorseCodeSymbol(int symbol)
     {
-        // Debug.Log( _morseCodeSymbols[symbol].ToString());
-       // StartCoroutine(PlayMorseCodeSymbolCo(_morseCodeSymbols[symbol])); // no longer used?...
+        //Debug.Log( _morseCodeSymbols[symbol].ToString());
+        // StartCoroutine(PlayMorseCodeSymbolCo(_morseCodeSymbols[symbol])); // no longer used... can be used to covert single simmple and test
     }
     public void PlayMorseCodeNote(int note)
     {
@@ -202,15 +203,18 @@ public class MorseCodePlayer : MonoBehaviour {
             morseSpeaker.PlayOneShot(morseNote_silence_0000000);
         }
     }
+
     public void RefreshDebugText()
     {
         _txtMorseDebug.text = "Current Symbol = M(" + _currentMorse.ToString("00")+")";
     }
+
     private void SetMorseDotDashText(string morseDotDash)
     {
         _inputfieldMorseDotDash.text = morseDotDash;
         //_txtMorseDotDash.text = morseDotDash;
     }
+
     private void SetMorseBinaryText(string binaryDash)
     {
         _inputfieldMorseBinary.text = binaryDash;
@@ -235,24 +239,6 @@ public class MorseCodePlayer : MonoBehaviour {
 
     }
 
-    // Clipboard functions (copying morse to clipboard)
-    // thanks to this forum post: https://forum.unity3d.com/threads/copy-textfield-or-textarea-text-to-clipboard.24101/ 
-    // THIS IS OUTDATED IN WEB PLAYER NOW?...
-    public void CopyMorseDotDashToClipboard()
-    {
-        _textEditor.text = _currentMorseDotDashMessage;
-        _textEditor.SelectAll();
-        _textEditor.Copy();
-    }
-
-    public void CopyMorseBinaryToClipboard()
-    {
-        _textEditor.text = _currentMorseBinaryMessage;
-        _textEditor.SelectAll();
-        _textEditor.Copy();
-    }
-
-
     // Only call to coroutine
     public void PlayCurrentMorseCodeMessage()
     {
@@ -265,37 +251,39 @@ public class MorseCodePlayer : MonoBehaviour {
     {
         _currentMorseMessage = ConvertStringToMorseCodeSymbols(_inputfieldMorseCodeMessage.text); // dot dash is assigned in this function... could change to string[] return but nah
     }
+    #endregion
 
+    #region Morse Conversion Functions
     public string ConvertStringToMorseCodeSymbols(string messageToMorse)
     {
         messageToMorse = messageToMorse.ToUpper();
         // messageToMorse = messageToMorse.ToUpper();
         string morsedMessage = "";
         string dotdashedMessage = "";
-        // Debug.Log("Message entered: " + messageToMorse);
+        //Debug.Log("Message entered: " + messageToMorse);
 
 
         int i = 0;
         int tmpASCII = 0;
         for (i = 0; i < messageToMorse.Length; i++)
         {
-           // Debug.Log("M[" + i + "] = " + messageToMorse[i]);
-           // Debug.Log("ASCII = " + messageToMorse[i].GetHashCode());
+           //Debug.Log("M[" + i + "] = " + messageToMorse[i]);
+           //Debug.Log("ASCII = " + messageToMorse[i].GetHashCode());
             tmpASCII = messageToMorse[i].GetHashCode();
 
-            // evaluate based on ASCII code
+            // Evaluate based on ASCII code
             // Letter value (range inclusive)...
             if (tmpASCII >= 65 && tmpASCII <= 90)
             {
-                // letters A - Z
+                // Letters A - Z
                 morsedMessage += _morseCodeSymbols[tmpASCII - MORSE_ASCII_LETTER_OFS];
                 dotdashedMessage += _morseCodeDotDashes[tmpASCII - MORSE_ASCII_LETTER_OFS];
 
                 // CAN ELIMINATE EXTRA SPACE TODO:
                 // Check if is next to last symbol, else can ignore?
-                // check next symbol if it is a space, ignore adding the -1?
+                // Check next symbol if it is a space, ignore adding the -1?
 
-                // SO NOT next to last symbol so can check index +1
+                // So NOT next to last symbol so can check index +1
                 if(i < messageToMorse.Length -1)
                 {
                    // Debug.Log(messageToMorse[i + 1].GetHashCode());
@@ -303,7 +291,7 @@ public class MorseCodePlayer : MonoBehaviour {
                     if (messageToMorse[i+1].GetHashCode() == MORSE_ASCII_SPACE)
                     {
                        // is space so do not add end of symbol silence?
-                       // Debug.Log("SPACE FOUND AT " + i);
+                       //Debug.Log("SPACE FOUND AT " + i);
                     }
                     else
                     {
@@ -336,7 +324,7 @@ public class MorseCodePlayer : MonoBehaviour {
                     if (messageToMorse[i + 1].GetHashCode() == MORSE_ASCII_SPACE)
                     {
                         // is space so do not add end of symbol silence?
-                       // Debug.Log("SPACE FOUND AT " + i+1);
+                       //Debug.Log("SPACE FOUND AT " + i+1);
                     }
                     else
                     {
@@ -348,8 +336,7 @@ public class MorseCodePlayer : MonoBehaviour {
             }
             else
             {
-               // Debug.Log(messageToMorse[i] + " is not a recognized morse symbol: ignored");
-
+               //Debug.Log(messageToMorse[i] + " is not a recognized morse symbol: ignored");
             }
 
         }
@@ -364,8 +351,6 @@ public class MorseCodePlayer : MonoBehaviour {
         //Debug.Log("Morse Code: " + dotdashedMessage);
         // SetMorseDotDashText(dotdashedMessage);
     }
-
-
 
     private void ConvertDotDashToBinary()
     {
@@ -417,17 +402,36 @@ public class MorseCodePlayer : MonoBehaviour {
             }
         }
     }
+    #endregion
 
-    
+    #region Clipboard / Copy Paste Functions
+    // Clipboard functions (copying morse to clipboard)
+    // thanks to this forum post: https://forum.unity3d.com/threads/copy-textfield-or-textarea-text-to-clipboard.24101/ 
+    // THIS IS OUTDATED IN WEB PLAYER NOW?...
+    public void CopyMorseDotDashToClipboard()
+    {
+        _textEditor.text = _currentMorseDotDashMessage;
+        _textEditor.SelectAll();
+        _textEditor.Copy();
+    }
 
-    // general numerical functions ... could be a static helper class...
+    public void CopyMorseBinaryToClipboard()
+    {
+        _textEditor.text = _currentMorseBinaryMessage;
+        _textEditor.SelectAll();
+        _textEditor.Copy();
+    }
+    #endregion
+
+    #region General Numerical Functions
+    //  Could be a static helper class...
     private int CalculateIntDigits(int number)
     {
         // ex 120 
         int numDigits = 0;
         while (number > 0)
         {
-           number = number / 10;
+            number = number / 10;
             numDigits += 1;
             // 120 iteration 1
             // 12 = 120/10      
@@ -442,10 +446,9 @@ public class MorseCodePlayer : MonoBehaviour {
 
         return numDigits;
     }
+    #endregion
 
-
-    // Co routines: Playing the morse code message
-    
+    #region Coroutines: Playing the morse code message    
     private IEnumerator PlayMorseCodeMessageCo()
     {
         // ex 3-13133
@@ -497,7 +500,7 @@ public class MorseCodePlayer : MonoBehaviour {
                 //Debug.Log("Triple Beep");
 
                 theTelegraphKeyAnimator.SetTrigger("trigCloseCircuit3Second");
-                theTelegraphKeyAnimator.speed = (1.0f / _playbackSpeeds[_currentPlaybackSetting]); // move this when have chance, only needs to be caklled when changing playback speed
+                theTelegraphKeyAnimator.speed = (1.0f / _playbackSpeeds[_currentPlaybackSetting]); // move this for optimizations, only needs to be called when changing playback speed
 
                 yield return new WaitForSeconds(3.0f * _playbackSpeedFactor);
 
@@ -518,7 +521,6 @@ public class MorseCodePlayer : MonoBehaviour {
 
                         // morsedMessage += _morseCodeSymbols[(int)MorseCodeSymbols.silence_000];
                         // dotdashedMessage += _morseCodeDotDashes[(int)MorseCodeSymbols.silence_000];
-
                     }
                 }
                 i++;
@@ -526,7 +528,7 @@ public class MorseCodePlayer : MonoBehaviour {
             }
             else if (_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_SIGN_NEGATIVE)
             {
-                // NEGATIVE SHOULD NEVER BE LAST SYMBOL SO SHOULD BE OK
+                // NEGATIVE SHOULD NEVER BE LAST SYMBOL SO SHOULD BE OK, ADD CHECK?
                 i++;
                 if(_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_NUM_1)
                 {
@@ -545,149 +547,10 @@ public class MorseCodePlayer : MonoBehaviour {
                 j++;
             }
 
-            // move cursor around highlighted symbol.. 
+            // TODO: move cursor around highlighted symbol... 
         }
         // end ....
         yield break;
     }
-
-    /* OBSOLETE , wasnt finished anyways... just use string []
-    private string GetDotDashFromSymbolCode(int morseSymbolCode)
-    {
-        string dotDash = "";
-
-        int i = 0;
-        int tmpCode = morseSymbolCode;
-        int codeLength = CalculateIntDigits(morseSymbolCode);
-        for (i = 0; i < codeLength; i++)
-        {
-            while (tmpCode > 0)
-            {
-                if(tmpCode >10)
-                {
-                    tmpCode = tmpCode / 10;
-                }
-                else
-                {
-
-                    tmpCode -= 10;
-                    // break... lol
-                }
-                // 120 iteration 1
-                //12 = 120/10      
-                //numdigits = 1
-                // iteration 2
-                //1 = 12/
-                // numdigits = 2
-                // iteration 3
-                // 0 = 1/10
-                // num digits = 3
-            }
-        }
-
-
-
-        return dotDash;
-    }
-    */
-    /* OBSOLETE JUST PLAYS WHOLE MESSAGE
-    // ienumerator to count to message length and play the respective sounds
-    private IEnumerator PlayMorseCodeSymbolCo(int code)
-    {
-        // ex 13     for a      need to get 1, then 3
-        // 3111 for b
-        //i nt messageSoundLength = 2;
-        int messageSoundLength = CalculateIntDigits(code);
-        int currentLength = messageSoundLength;
-        int currentSymbol;
-        int currentCode = code;
-        // precalculate or is code /10 N times
-        
-        // if length 2
-       // currentSymbol = messageSoundLength / 10; // 13/10 =1
-       // Debug.Log("MCP.PMCM().currentSymbol = " + currentSymbol);
-
-
-        // better way
-        // messageSoundLength = CalculateIntergerLength(code);
-
-        int codeDivisor = 10;
-        // 
-
-        Debug.Log("Initial Code = " + code);
-
-        while (currentLength >= 1)
-        {
-            Debug.Log("Current Code = " + currentCode);
-            // get current symbol from 
-            // if 113 need to div by (10^2)
-            codeDivisor = ((int)Mathf.Pow(10.0f, (float)currentLength - 1.0f));
-            currentSymbol = currentCode / codeDivisor;
-            // reduce code to to 13 so 113 -100
-            currentCode -= codeDivisor*currentSymbol; // mult by 1 or 3
-
-            Debug.Log("MCP.PMCM().currentSymbol = " + currentSymbol);
-
-            // play note
-            if (currentSymbol == (int)MorseCodeNotes.morse_1)
-            {
-                // play note
-                PlayMorseCodeNote((int)MorseCodeNotes.morse_1);
-
-                // wait seconds
-                yield return new WaitForSeconds(1.0f);
-
-                if (currentLength == 1)
-                {
-                    // laast one so can end
-                    Debug.Log("End of MorseSymbol");
-                    yield break;
-                    // current length -= 1;
-                }
-                else
-                {
-                    // repeat....
-                    currentLength -= 1;
-                }
-            }
-            else if (currentSymbol == (int)MorseCodeNotes.morse_3)
-            {
-                // play note
-                PlayMorseCodeNote((int)MorseCodeNotes.morse_3);
-
-                // wait seconds
-                yield return new WaitForSeconds(3.0f);
-                if (currentLength == 1)
-                {
-                    // laast one so can end
-                    Debug.Log("End of MorseSymbol");
-                    yield break;
-                }
-                else
-                {
-                    // repeat....
-                    currentLength -= 1;
-                }
-            }
-        }
-
-
-        //  yield return new WaitForSeconds(5.0f);
-
-
-
-
-        Debug.Log("HOW I GET HERE?");
-
-
-
-
-            // todo B or n method
-
-
-
-            // end should not reach....
-            yield break;
-    }
-    */
+    #endregion
 }
