@@ -260,31 +260,32 @@ public class MorseCodePlayer : MonoBehaviour {
         // messageToMorse = messageToMorse.ToUpper();
         string morsedMessage = "";
         string dotdashedMessage = "";
-        //Debug.Log("Message entered: " + messageToMorse);
+        Debug.Log("Message entered: " + messageToMorse);
 
 
         int i = 0;
         int tmpASCII = 0;
         for (i = 0; i < messageToMorse.Length; i++)
         {
-           //Debug.Log("M[" + i + "] = " + messageToMorse[i]);
-           //Debug.Log("ASCII = " + messageToMorse[i].GetHashCode());
-            tmpASCII = messageToMorse[i].GetHashCode();
+           Debug.Log("M[" + i + "] = " + messageToMorse[i]);
+           //Debug.Log("ASCII = " + messageToMorse[i].GetHashCode()); // DEPRECATED
+            tmpASCII = System.Convert.ToInt32(messageToMorse[i]);
+            Debug.Log("tmp asci hash code is = " + tmpASCII);
 
             // Evaluate based on ASCII code
             // Letter value (range inclusive)...
             if (tmpASCII >= 65 && tmpASCII <= 90)
             {
                 // Letters A - Z
+                Debug.Log("tmp asci is letter # = " + tmpASCII);
                 morsedMessage += _morseCodeSymbols[tmpASCII - MORSE_ASCII_LETTER_OFS];
                 dotdashedMessage += _morseCodeDotDashes[tmpASCII - MORSE_ASCII_LETTER_OFS];
-
                 // CAN ELIMINATE EXTRA SPACE TODO:
                 // Check if is next to last symbol, else can ignore?
                 // Check next symbol if it is a space, ignore adding the -1?
 
                 // So NOT next to last symbol so can check index +1
-                if(i < messageToMorse.Length -1)
+                if (i < messageToMorse.Length -1)
                 {
                    // Debug.Log(messageToMorse[i + 1].GetHashCode());
                    // Debug.Log(MORSE_ASCII_SPACE);
@@ -346,9 +347,11 @@ public class MorseCodePlayer : MonoBehaviour {
         _currentMorseDotDashMessage = dotdashedMessage;
         ConvertDotDashToBinary();
         SetMorseBinaryText(_currentMorseBinaryMessage);
+
+        Debug.Log("Morse Code: " + morsedMessage);
+        Debug.Log("Morse Code: binary" + _currentMorseBinaryMessage);
+        Debug.Log("Morse Code: dotdash" + dotdashedMessage);
         return morsedMessage;
-        //Debug.Log("Morse Code: " + morsedMessage);
-        //Debug.Log("Morse Code: " + dotdashedMessage);
         // SetMorseDotDashText(dotdashedMessage);
     }
 
