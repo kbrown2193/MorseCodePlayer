@@ -228,13 +228,13 @@ public class MorseCodePlayer : MonoBehaviour {
         _playbackSpeedFactor = _playbackSpeeds[playbackSetting];
         morseSpeaker.pitch = 1.0f / _playbackSpeedFactor;
 
-        // set all others to White?
+        // set all others to unselected color, White
         for (int i = 0; i < PlaybackSpeedButtons.Length; i ++)
         {
             PlaybackSpeedButtons[i].image.color = PLAYBACKBUTTON_COLOR_UNSELECTED;
         }
 
-        // set current to red
+        // set current to selected color, red
         PlaybackSpeedButtons[playbackSetting].image.color = PLAYBACKBUTTON_COLOR_SELECTED;
 
     }
@@ -467,7 +467,7 @@ public class MorseCodePlayer : MonoBehaviour {
                 //Debug.Log((1.0f / _playbackSpeeds[_currentPlaybackSetting]));
                 yield return new WaitForSeconds(1.0f *_playbackSpeedFactor);
 
-                // to ad end of symbol silence or no...
+                // to add end of symbol silence or no...
                 // SO NOT next to last symbol so can check index +1
                 if (i < messageLength - 1)
                 {
@@ -476,7 +476,6 @@ public class MorseCodePlayer : MonoBehaviour {
                     {
                         // is space so do not add end of symbol silence?
                         //Debug.Log("SPACE FOUND AT " + i + 1);
-
                     }
                     else
                     {
