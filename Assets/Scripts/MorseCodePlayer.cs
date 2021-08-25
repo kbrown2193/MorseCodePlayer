@@ -260,24 +260,21 @@ public class MorseCodePlayer : MonoBehaviour {
         // messageToMorse = messageToMorse.ToUpper();
         string morsedMessage = "";
         string dotdashedMessage = "";
-        Debug.Log("Message entered: " + messageToMorse);
+        //Debug.Log("Message entered: " + messageToMorse);
 
 
         int i = 0;
         int tmpASCII = 0;
         for (i = 0; i < messageToMorse.Length; i++)
         {
-           Debug.Log("M[" + i + "] = " + messageToMorse[i]);
-           //Debug.Log("ASCII = " + messageToMorse[i].GetHashCode()); // DEPRECATED
+            //Debug.Log("M[" + i + "] = " + messageToMorse[i]);
             tmpASCII = System.Convert.ToInt32(messageToMorse[i]);
-            Debug.Log("tmp asci hash code is = " + tmpASCII);
-
             // Evaluate based on ASCII code
             // Letter value (range inclusive)...
             if (tmpASCII >= 65 && tmpASCII <= 90)
             {
                 // Letters A - Z
-                Debug.Log("tmp asci is letter # = " + tmpASCII);
+                //Debug.Log("tmp asci is letter # = " + tmpASCII);
                 morsedMessage += _morseCodeSymbols[tmpASCII - MORSE_ASCII_LETTER_OFS];
                 dotdashedMessage += _morseCodeDotDashes[tmpASCII - MORSE_ASCII_LETTER_OFS];
                 // CAN ELIMINATE EXTRA SPACE TODO:
@@ -287,9 +284,8 @@ public class MorseCodePlayer : MonoBehaviour {
                 // So NOT next to last symbol so can check index +1
                 if (i < messageToMorse.Length -1)
                 {
-                   // Debug.Log(messageToMorse[i + 1].GetHashCode());
-                   // Debug.Log(MORSE_ASCII_SPACE);
-                    if (messageToMorse[i+1].GetHashCode() == MORSE_ASCII_SPACE)
+                    // Debug.Log(MORSE_ASCII_SPACE);
+                    if (System.Convert.ToInt32(messageToMorse[i+1]) == MORSE_ASCII_SPACE)
                     {
                        // is space so do not add end of symbol silence?
                        //Debug.Log("SPACE FOUND AT " + i);
@@ -320,9 +316,8 @@ public class MorseCodePlayer : MonoBehaviour {
                 // SO NOT next to last symbol so can check index +1
                 if (i < messageToMorse.Length - 1)
                 {
-                    // Debug.Log(messageToMorse[i + 1].GetHashCode());
                     // Debug.Log(MORSE_ASCII_SPACE);
-                    if (messageToMorse[i + 1].GetHashCode() == MORSE_ASCII_SPACE)
+                    if (System.Convert.ToInt32(messageToMorse[i + 1]) == MORSE_ASCII_SPACE)
                     {
                         // is space so do not add end of symbol silence?
                        //Debug.Log("SPACE FOUND AT " + i+1);
@@ -348,9 +343,9 @@ public class MorseCodePlayer : MonoBehaviour {
         ConvertDotDashToBinary();
         SetMorseBinaryText(_currentMorseBinaryMessage);
 
-        Debug.Log("Morse Code: " + morsedMessage);
-        Debug.Log("Morse Code: binary" + _currentMorseBinaryMessage);
-        Debug.Log("Morse Code: dotdash" + dotdashedMessage);
+        //Debug.Log("Morse Code: " + morsedMessage);
+        //Debug.Log("Morse Code: binary" + _currentMorseBinaryMessage);
+        //Debug.Log("Morse Code: dotdash" + dotdashedMessage);
         return morsedMessage;
         // SetMorseDotDashText(dotdashedMessage);
     }
@@ -462,7 +457,7 @@ public class MorseCodePlayer : MonoBehaviour {
         int j = 0; // j is the index of the dot-dash, so does not increment when sees a -
         while (i < messageLength)
         {
-            if(_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_NUM_1)
+            if(System.Convert.ToInt32(_currentMorseMessage[i]) == MORSE_ASCII_NUM_1)
             {
                 morseSpeaker.PlayOneShot(morseNote_1);
                 //Debug.Log("Single Beep");
@@ -476,9 +471,8 @@ public class MorseCodePlayer : MonoBehaviour {
                 // SO NOT next to last symbol so can check index +1
                 if (i < messageLength - 1)
                 {
-                    // Debug.Log(messageToMorse[i + 1].GetHashCode());
                     // Debug.Log(MORSE_ASCII_SPACE);
-                    if (_currentMorseMessage[i + 1].GetHashCode() == MORSE_ASCII_SPACE)
+                    if (System.Convert.ToInt32(_currentMorseMessage[i + 1]) == MORSE_ASCII_SPACE)
                     {
                         // is space so do not add end of symbol silence?
                         //Debug.Log("SPACE FOUND AT " + i + 1);
@@ -497,7 +491,7 @@ public class MorseCodePlayer : MonoBehaviour {
                 j++;
 
             }
-            else if(_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_NUM_3)
+            else if(System.Convert.ToInt32(_currentMorseMessage[i]) == MORSE_ASCII_NUM_3)
             {
                 morseSpeaker.PlayOneShot(morseNote_3);
                 //Debug.Log("Triple Beep");
@@ -509,9 +503,8 @@ public class MorseCodePlayer : MonoBehaviour {
 
                 if (i < messageLength - 1)
                 {
-                    //Debug.Log(messageToMorse[i + 1].GetHashCode());
                     //Debug.Log(MORSE_ASCII_SPACE);
-                    if (_currentMorseMessage[i + 1].GetHashCode() == MORSE_ASCII_SPACE)
+                    if (System.Convert.ToInt32(_currentMorseMessage[i + 1]) == MORSE_ASCII_SPACE)
                     {
                         // is space so do not add end of symbol silence?
                         //Debug.Log("SPACE FOUND AT " + i + 1);
@@ -529,18 +522,18 @@ public class MorseCodePlayer : MonoBehaviour {
                 i++;
                 j++;
             }
-            else if (_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_SIGN_NEGATIVE)
+            else if (System.Convert.ToInt32(_currentMorseMessage[i]) == MORSE_ASCII_SIGN_NEGATIVE)
             {
                 // NEGATIVE SHOULD NEVER BE LAST SYMBOL SO SHOULD BE OK, ADD CHECK?
                 i++;
-                if(_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_NUM_1)
+                if(System.Convert.ToInt32(_currentMorseMessage[i]) == MORSE_ASCII_NUM_1)
                 {
                     //Debug.Log("Symbol Silence 000");
 
                     // Symbol  space    000
                     yield return new WaitForSeconds(3.0f * _playbackSpeedFactor);
                 }
-                else if (_currentMorseMessage[i].GetHashCode() == MORSE_ASCII_NUM_2)
+                else if (System.Convert.ToInt32(_currentMorseMessage[i]) == MORSE_ASCII_NUM_2)
                 {
                     // word space   0000000
                     //Debug.Log("Word Silence 0000000");
