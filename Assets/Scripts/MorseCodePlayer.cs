@@ -71,11 +71,11 @@ public class MorseCodePlayer : MonoBehaviour {
      * 
      * 0 = 48
      * 1 = 49
-     * 
+     * ..
      * 9 = 57
      */
     const int MORSE_ASCII_LETTER_OFS = 65;
-    const int MORSE_ASCII_NUMBER_OFS = 22; // 48 -  26 (for alphabet codes) 
+    const int MORSE_ASCII_NUMBER_OFS = 22; // 48 - 26
 
     const int MORSE_ASCII_SPACE = 32;
     const int MORSE_ASCII_NUM_0 = 48;
@@ -116,7 +116,7 @@ public class MorseCodePlayer : MonoBehaviour {
         morse_click,
     }
 
-    // silence_0 is an implied in this encoding process. seperation of symbols indicates a 0.  i.e. a 113  is really 101030 and 113-1331 is really 1010300030301
+    // silence_0 is an implied in this encoding process. Seperation of symbols indicates a 0.  i.e. a 113  is really 101030 and 113-1331 is really 1010300030301
     public enum MorseCodeSymbols
     {
         A_13,
@@ -181,7 +181,7 @@ public class MorseCodePlayer : MonoBehaviour {
     public void PlayMorseCodeSymbol(int symbol)
     {
         //Debug.Log( _morseCodeSymbols[symbol].ToString());
-        // StartCoroutine(PlayMorseCodeSymbolCo(_morseCodeSymbols[symbol])); // no longer used... can be used to covert single simmple and test
+        // StartCoroutine(PlayMorseCodeSymbolCo(_morseCodeSymbols[symbol])); // no longer used... can be used to covert single symbol and test
     }
     public void PlayMorseCodeNote(int note)
     {
@@ -252,7 +252,7 @@ public class MorseCodePlayer : MonoBehaviour {
     // Only one call to convert function using the input field to reduce redundancy of code.  
     public void  EnterMorseCodeString( )
     {
-        _currentMorseMessage = ConvertStringToMorseCodeSymbols(_inputfieldMorseCodeMessage.text); // dot dash is assigned in this function... could change to string[] return but nah
+        _currentMorseMessage = ConvertStringToMorseCodeSymbols(_inputfieldMorseCodeMessage.text); // dot dash is assigned in this function... could change to string[] return...
     }
     #endregion
 
